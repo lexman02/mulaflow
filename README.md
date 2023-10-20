@@ -28,9 +28,9 @@ CSCI 3030 Project
 > Both the frontend and backend server automatically refresh on save so you don't have to re-run these commands on changes.
 1. Install the dependencies in your virtual environment `pip install -r requirements.txt`
 2. Install the frontend packages
-  - npm `npm install`
-  - yarn `yarn install`
-  - pnpm `pnpm install`
+    - npm `npm install`
+    - yarn `yarn install`
+    - pnpm `pnpm install`
 1. Run the development servers
    1. Frontend: Bundles and compiles the CSS (Tailwind)
        - npm `npm run dev`
