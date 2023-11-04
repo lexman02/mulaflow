@@ -18,6 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("dashboard/", include("dashboard.urls")),
     path("budget/", include("budget.urls")),
     path("__reload__/", include("django_browser_reload.urls")),  # Auto reloads frontend
 ]
