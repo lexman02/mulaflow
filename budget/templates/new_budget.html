@@ -1,0 +1,35 @@
+{% extends 'authenticated.html' %}
+
+{% block content %}
+    <form id="budget_form" method="POST" x-data="{ incomeSourceCount: 1, expenseCount: 1 }">
+        {% csrf_token %}
+
+        <button @click.prevent="++incomeSourceCount">Add Income Source</button>
+        <button @click.prevent="++expenseCount">Add Expense</button>
+
+        <div>
+            <template x-for="count in incomeSourceCount">
+                <div>
+                    <input type="text" :name="'income_source_name_' + count" :placeholder="'Income Source Name ' + count">
+                    <input type="number" :name="'income_source_amount_' + count" :placeholder="'Amount ' + count">
+                </div>
+            </template>
+        </div>
+
+        <div>
+            <template x-for="count in expenseCount">
+                <div>
+                    <input type="text" :name="'expense_name_' + count" :placeholder="'Expense Name ' + count">
+                    <input type="number" :name="'expense_amount_' + count" :placeholder="'Amount ' + count">
+                    {{ form.frequency }}
+                    {{ form.due_date }}
+                </div>
+            </template>
+        </div>
+
+        <input type="number" name="incomeSourceCount" :value="incomeSourceCount" hidden>
+        <input type="number" name="expenseCount" :value="expenseCount" hidden>
+
+        <button type="submit">Submit</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'authenticated.html' %}
+
+{% block content %}
+    <div class="flex items-center space-x-5">
+        <h2 class="text-3xl font-black text-gray-800 uppercase">{% now "M Y" %}</h2>
+        <div class="inline-flex p-1 space-x-1 text-gray-500 rounded bg-gray-200">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-4.28 9.22a.75.75 0 000 1.06l3 3a.75.75 0 101.06-1.06l-1.72-1.72h5.69a.75.75 0 000-1.5h-5.69l1.72-1.72a.75.75 0 00-1.06-1.06l-3 3z" clip-rule="evenodd" />
+            </svg>
+
+                    <div class="border rounded-full border-gray-400"></div>
+
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm4.28 10.28a.75.75 0 000-1.06l-3-3a.75.75 0 10-1.06 1.06l1.72 1.72H8.25a.75.75 0 000 1.5h5.69l-1.72 1.72a.75.75 0 101.06 1.06l3-3z" clip-rule="evenodd" />
+            </svg>
+
+        </div>
+    </div>
+    {% block budget_content %}
+        <!-- default content text (typically empty) -->
+    {% endblock %}
+{% endblock %}
