@@ -11,6 +11,9 @@ CSCI 3030 Project
 ### Frontend
 - [Heroicons (Icons used in Figma)](https://heroicons.com/)
 - [Tailwind CSS (Colors and misc. styling)](https://tailwindcss.com/docs/utility-first)
+- [Alpine.js](https://alpinejs.dev/start-here)
+- [Chart.js Docs](https://www.chartjs.org/docs/latest/)
+- [Chart.js 101](https://simpleisbetterthancomplex.com/tutorial/2020/01/19/how-to-use-chart-js-with-django.html)
 - [Django Templating Documentation](https://docs.djangoproject.com/en/4.2/topics/templates/)
   - [List of all built-in template tags and filters](https://docs.djangoproject.com/en/4.2/ref/templates/builtins/)
 
