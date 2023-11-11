@@ -46,6 +46,26 @@ class UserExpense(Expense):
     due_date = models.DateField(null=True, blank=True)
 
 
+class BudgetManager(models.Manager):
+    def adjacent_budgets(self, user, year, month):
+        prev_month = month - 1 if month > 1 else 12
+        prev_year = year if month > 1 else year - 1
+        next_month = month + 1 if month < 12 else 1
+        next_year = year if month < 12 else year + 1
+
+        try:
+            next_budget = self.get(user=user, created__month=next_month, created__year=next_year)
+        except Budget.DoesNotExist:
+            next_budget = None
+
+        try:
+            prev_budget = self.get(user=user, created__month=prev_month, created__year=prev_year)
+        except Budget.DoesNotExist:
+            prev_budget = None
+
+        return prev_budget, next_budget
+
+
 class Budget(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -56,3 +76,4 @@ class Budget(models.Model):
     surplus = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    objects = BudgetManager()

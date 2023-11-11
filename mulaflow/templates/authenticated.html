@@ -1,32 +1,18 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% block title %}
-        <title>MulaFlow</title>
-    {% endblock %}
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" href="{% static 'src/styles.css' %}">
+{% extends 'base.html' %}
 
-    {# AlpineJS #}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-</head>
-<body>
-<div class="bg-gray-50 min-h-screen flex items-center justify-center">
-    <div class="flex-1 flex flex-col space-y-5 lg:space-y-0 lg:flex-row h-screen">
-
-        {# Navigation (Sidebar) #}
-        <div class="border-r px-2 lg:px-4 py-2 lg:py-10 flex lg:flex-col justify-between">
-            {% include 'includes/sidebar.html' %}
-            {% include 'includes/full-logo.html' %}
-        </div>
-        <div class="flex-1 md:p-16 sm:px-0 space-y-10 overflow-auto">
-            {% block content %}
-                <!-- default content text (typically empty) -->
-            {% endblock %}
+{% block base_content %}
+    <div class="bg-gray-50 min-h-screen flex items-center justify-center">
+        <div class="flex-1 flex flex-col space-y-5 lg:space-y-0 lg:flex-row h-screen">
+            {# Navigation (Sidebar) #}
+            <div class="border-r px-2 lg:px-4 py-2 lg:py-10 flex lg:flex-col justify-between">
+                {% include 'includes/sidebar.html' %}
+                {% include 'includes/full-logo.html' %}
+            </div>
+            <div class="flex-1 md:p-16 sm:px-0 space-y-10 overflow-auto">
+                {% block content %}
+                    <!-- default content text (typically empty) -->
+                {% endblock %}
+            </div>
         </div>
     </div>
-</div>
-</body>
-</html>
+{% endblock %}

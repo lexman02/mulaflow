@@ -1,22 +1,65 @@
 {% extends 'authenticated.html' %}
 
 {% block content %}
-    <div class="flex items-center space-x-5">
-        <h2 class="text-3xl font-black text-gray-800 uppercase">{% now "M Y" %}</h2>
+    <div class="flex items-center space-x-5" x-data="header()" x-init="initHeader()">
+        <h2 class="text-3xl font-black text-gray-800 uppercase" x-text="currentDate"></h2>
         <div class="inline-flex p-1 space-x-1 text-gray-500 rounded bg-gray-200">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-4.28 9.22a.75.75 0 000 1.06l3 3a.75.75 0 101.06-1.06l-1.72-1.72h5.69a.75.75 0 000-1.5h-5.69l1.72-1.72a.75.75 0 00-1.06-1.06l-3 3z" clip-rule="evenodd" />
-            </svg>
+            <a :href="{prev_url}" :class="{'cursor-not-allowed text-gray-500/30': !prev_budget}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-4.28 9.22a.75.75 0 000 1.06l3 3a.75.75 0 101.06-1.06l-1.72-1.72h5.69a.75.75 0 000-1.5h-5.69l1.72-1.72a.75.75 0 00-1.06-1.06l-3 3z" clip-rule="evenodd" />
+                </svg>
+            </a>
 
                     <div class="border rounded-full border-gray-400"></div>
 
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm4.28 10.28a.75.75 0 000-1.06l-3-3a.75.75 0 10-1.06 1.06l1.72 1.72H8.25a.75.75 0 000 1.5h5.69l-1.72 1.72a.75.75 0 101.06 1.06l3-3z" clip-rule="evenodd" />
-            </svg>
-
+            <a :href="{next_url}" :class="{'cursor-not-allowed text-gray-500/30': !next_budget}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm4.28 10.28a.75.75 0 000-1.06l-3-3a.75.75 0 10-1.06 1.06l1.72 1.72H8.25a.75.75 0 000 1.5h5.69l-1.72 1.72a.75.75 0 101.06 1.06l3-3z" clip-rule="evenodd" />
+                </svg>
+            </a>
         </div>
     </div>
     {% block budget_content %}
         <!-- default content text (typically empty) -->
     {% endblock %}
+    <script>
+        function header() {
+            return {
+                year: {{ year }},
+                month: {{ month }},
+                currentDate: '',
+                prev_budget: {{ prev_budget|lower }},
+                next_budget: {{ next_budget|lower }},
+                prev_url: '',
+                next_url: '',
+
+                initHeader() {
+                    this.getCurrentDate();
+                    this.generateUrls();
+                },
+
+                getCurrentDate() {
+                    this.currentDate = new Date(this.year, this.month - 1).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+                },
+
+                generateUrls() {
+                    if (this.prev_budget) {
+                        if (this.month === 1) {
+                            this.prev_url = '/budget/{{ year|add:"-1" }}/12';
+                        } else {
+                            this.prev_url = '/budget/{{ year }}/{{ month|add:"-1" }}';
+                        }
+                    }
+
+                    if (this.next_budget) {
+                        if (this.month === 12) {
+                            this.next_url = '/budget/{{ year|add:"1" }}/1';
+                        } else {
+                            this.next_url = '/budget/{{ year }}/{{ month|add:"1" }}';
+                        }
+                    }
+                },
+            }
+        }
+    </script>
 {% endblock %}
