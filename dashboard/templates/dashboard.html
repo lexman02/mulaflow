@@ -17,15 +17,15 @@
         {% else %}
             <div class="w-full shadow-xl shadow-green-600/40 px-5 py-4 bg-green-600 rounded-3xl">
                 <h4 class="text-green-900 text-xl font-semibold">SURPLUS</h4>
-                <h4 class="text-white text-4xl font-extrabold">${{ budget.surplus }}</h4>
+                <h4 class="text-white text-4xl font-extrabold">${{ budget_totals.surplus }}</h4>
             </div>
             <div class="w-full shadow-xl shadow-amber-500/40 px-5 py-4 bg-amber-500 rounded-3xl">
                 <h4 class="text-amber-800 text-xl font-semibold">INCOME</h4>
-                <h4 class="text-white text-4xl font-extrabold">${{ budget.total_monthly_income }}</h4>
+                <h4 class="text-white text-4xl font-extrabold">${{ budget_totals.income }}</h4>
             </div>
             <div class="w-full shadow-xl shadow-red-600/40 px-5 py-4 bg-red-600 rounded-3xl">
                 <h4 class="text-red-900 text-xl font-semibold">EXPENSES</h4>
-                <h4 class="text-white text-4xl font-extrabold">${{ budget.total_monthly_expenses }}</h4>
+                <h4 class="text-white text-4xl font-extrabold">${{ budget_totals.expenses }}</h4>
             </div>
         {% endif %}
     </div>

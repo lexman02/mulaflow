@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from budget.models import Budget
 
 
-def dashboard(request):
+def get_dashboard(request):
     current_date = datetime.date.today()
     # Get the authenticated user's budget for the current month, assuming your logic to retrieve it
     try:
@@ -13,8 +13,11 @@ def dashboard(request):
         budget = Budget.objects.get(user=request.user.id, created__month=current_date.month,
                                     created__year=current_date.year)
 
+        budget_totals = Budget.objects.current_budget_totals(request.user)
+
         context = {
             'budget': budget,
+            'budget_totals': budget_totals,
         }
 
         return render(request, 'dashboard.html', context)
