@@ -2,7 +2,7 @@
 {% load widget_tweaks %}
 
 {% block content %}
-    <form id="budget_form" method="POST" x-data="{ incomeSourceCount: 1, expenseCount: 1 }">
+    <form id="budget_form" method="POST" x-data="manageBudget()">
         {% csrf_token %}
 
         <div class="space-y-12">
@@ -10,20 +10,20 @@
                 <h2 class="text-gray-900 font-bold text-3xl">Income Sources</h2>
                 <p class="text-gray-500/80 font-medium mb-3">Add all of your income sources here.</p>
                 <div class="bg-gray-200/70 p-3.5 rounded-lg w-3/5">
-                    <template x-for="count in incomeSourceCount">
-                        <div class="flex space-x-1 mb-2" x-data="{ nameField: 'income_source_name_' + count, amountField: 'income_source_amount_' + count }">
+                    <template x-for="(incomeSource, index) in incomeSources">
+                        <div class="flex space-x-1 mb-2" x-data="{ nameField: 'income_source_name_' + index, amountField: 'income_source_amount_' + index }">
                             <div class="flex flex-col w-4/5">
                                 <label :for="nameField">Name</label>
-                                {% render_field income_source_form.name class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2" placeholder="Work" autocomplete="off" ::name="nameField" ::id="nameField"%}
+                                {% render_field income_source_form.name class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2" placeholder="Work" autocomplete="off" ::name="nameField" ::id="nameField" x-model="incomeSource.name" %}
                             </div>
                             <div class="flex flex-col w-1/5">
                                 <label :for="amountField">Amount</label>
                                 <div class="flex items-center space-x-1.5">
                                     <div class="flex items-center relative">
                                         <span class="absolute ml-2 text-sm">$</span>
-                                        {% render_field income_source_form.amount class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2 pl-4 w-full" min=0 placeholder="1200" ::name="amountField" ::id="amountField" %}
+                                        {% render_field income_source_form.amount class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2 pl-4 w-full" min=0 placeholder="1200" ::name="amountField" ::id="amountField" x-model="incomeSource.amount" %}
                                     </div>
-                                    <button @click.prevent="--incomeSourceCount" x-cloak x-show="count > 1" class="p-1 border-2 border-red-500 rounded-lg text-red-500 active:ring active:ring-red-300 transition">
+                                    <button @click.prevent="removeIncomeSource(index)" x-cloak x-show="incomeSourceCount > 1" x-transition.duration.300ms class="p-1 border-2 border-red-500 rounded-lg text-red-500 active:ring active:ring-red-300 transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
                                             <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" />
                                         </svg>
@@ -32,7 +32,7 @@
                             </div>
                         </div>
                     </template>
-                    <button @click.prevent="++incomeSourceCount" class="my-1 py-1 px-2 border-2 bg-gray-400 rounded-lg text-sm text-white">Add Income Source</button>
+                    <button @click.prevent="addIncomeSource" class="my-1 py-1 px-2 border-2 bg-gray-400 rounded-lg text-sm text-white">Add Income Source</button>
                 </div>
             </div>
 
@@ -40,28 +40,28 @@
                 <h2 class="text-gray-900 font-bold text-3xl">Expense</h2>
                 <p class="text-gray-500/80 font-medium mb-3">Add all of your important expenses (Rent, Gas, Groceries, etc)</p>
                 <div class="bg-gray-200/70 p-3.5 rounded-lg w-2/3">
-                    <template x-for="count in expenseCount">
-                        <div class="flex space-x-1 mb-2" x-data="{ nameField: 'expense_name_' + count, amountField: 'expense_amount_' + count, frequencyField: 'expense_frequency_' + count, dueDateField: 'expense_due_date_' + count }">
+                    <template x-for="(expense, index) in expenses">
+                        <div class="flex space-x-1 mb-2" x-data="{ nameField: 'expense_name_' + index, amountField: 'expense_amount_' + index, frequencyField: 'expense_frequency_' + index, dueDateField: 'expense_due_date_' + index }">
                             <div class="flex flex-col w-4/6">
                                 <label :for="nameField">Name</label>
-                                {% render_field user_expense_form.name class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2" placeholder="Rent" autocomplete="off" ::name="nameField" ::id="nameField"%}
+                                {% render_field user_expense_form.name class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2" placeholder="Rent" autocomplete="off" ::name="nameField" ::id="nameField" x-model="expense.name" %}
                             </div>
                             <div class="flex flex-col w-2/6">
                                 <label :for="amountField">Amount</label>
                                 <div class="flex items-center relative">
                                     <span class="absolute ml-2 text-sm">$</span>
-                                    {% render_field user_expense_form.amount class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2 pl-4 w-full" min=0 placeholder="800" ::name="amountField" ::id="amountField" %}
+                                    {% render_field user_expense_form.amount class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2 pl-4 w-full" min=0 placeholder="800" ::name="amountField" ::id="amountField" x-model="expense.amount" %}
                                 </div>
                             </div>
                             <div class="flex flex-col w-2/6">
                                 <label :for="frequencyField">Frequency</label>
-                                {% render_field user_expense_form.frequency class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2" ::name="frequencyField" ::id="frequencyField"%}
+                                {% render_field user_expense_form.frequency class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2" ::name="frequencyField" ::id="frequencyField" x-model="expense.frequency" %}
                             </div>
                             <div class="flex flex-col w-2/6">
                                 <label :for="dueDateField">Due Date</label>
                                 <div class="flex items-center space-x-1.5">
-                                    {% render_field user_expense_form.due_date class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2" ::name="dueDateField" ::id="dueDateField"%}
-                                    <button @click.prevent="--expenseCount" x-cloak x-show="count > 1" class="p-1 border-2 border-red-500 rounded-lg text-red-500 active:ring active:ring-red-300 transition">
+                                    {% render_field user_expense_form.due_date class+="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 p-2" ::name="dueDateField" ::id="dueDateField" x-model="expense.dueDate" %}
+                                    <button @click.prevent="removeExpense(index)" x-cloak x-show="expenseCount > 1" x-transition.duration.300ms class="p-1 border-2 border-red-500 rounded-lg text-red-500 active:ring active:ring-red-300 transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
                                             <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" />
                                         </svg>
@@ -70,7 +70,7 @@
                             </div>
                         </div>
                     </template>
-                    <button @click.prevent="++expenseCount" class="my-1 py-1 px-2 border-2 bg-gray-400 rounded-lg text-sm text-white">Add Expense</button>
+                    <button @click.prevent="addExpense" class="my-1 py-1 px-2 border-2 bg-gray-400 rounded-lg text-sm text-white">Add Expense</button>
                 </div>
             </div>
 
@@ -80,4 +80,68 @@
             <button type="submit" class="w-1/2 text-white bg-teal-500 hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center shadow-lg">Submit</button>
         </div>
     </form>
+
+    <script>
+        function manageBudget() {
+            return {
+                incomeSourceCount: 0,
+                expenseCount: 0,
+                incomeSources: [
+                    {
+                        name: '',
+                        amount: null,
+                    }
+                ],
+                expenses: [
+                    {
+                        name: '',
+                        amount: null,
+                        frequency: 'm',
+                        dueDate: '{% now "Y-m-d" %}',
+                    }
+                ],
+
+                debug() {
+                    console.log(this.incomeSources);
+                    console.log(this.expenses);
+                },
+
+                addIncomeSource() {
+                    this.incomeSources.push({
+                        name: '',
+                        amount: null,
+                    });
+                    this.incomeSourceCount = this.incomeSources.length;
+                },
+
+                removeIncomeSource(index) {
+                    if (this.incomeSources[index].original) {
+                        this.deletedIncomeSources.push(this.incomeSources[index].id);
+                    }
+                    this.incomeSources.splice(index, 1);
+                    this.incomeSourceCount = this.incomeSources.length;
+                    console.log('income', this.deletedIncomeSources);
+                },
+
+                addExpense() {
+                    this.expenses.push({
+                        name: '',
+                        amount: null,
+                        frequency: 'm',
+                        dueDate: '{% now "Y-m-d" %}',
+                    });
+                    this.expenseCount = this.expenses.length;
+                },
+
+                removeExpense(index) {
+                    if (this.expenses[index].original) {
+                        this.deletedExpenses.push(this.expenses[index].id);
+                    }
+                    this.expenses.splice(index, 1);
+                    this.expenseCount = this.expenses.length;
+                    console.log('expenses', this.deletedExpenses);
+                }
+            }
+        }
+    </script>
 {% endblock %}
