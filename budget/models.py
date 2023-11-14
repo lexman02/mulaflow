@@ -65,15 +65,17 @@ class BudgetManager(models.Manager):
 
         return prev_budget, next_budget
 
+    def current_budget_totals(self, user):
+        budget = self.get(user=user)
+        income, expenses = sum(item.amount for item in budget.income_sources.all()), sum(item.amount for item in budget.expenses.all())
+        return {'income': income, 'expenses': expenses, 'surplus': income - expenses}
+
 
 class Budget(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     income_sources = models.ManyToManyField(IncomeSource)
     expenses = models.ManyToManyField(UserExpense)
-    total_monthly_income = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    total_monthly_expenses = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    surplus = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     objects = BudgetManager()
