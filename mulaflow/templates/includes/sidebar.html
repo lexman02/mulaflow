@@ -33,7 +33,7 @@
             </svg>
         </a>
         <div class="w-full">
-            <a class="flex justify-between items-center font-semibold hover:bg-gray-600 hover:text-gray-100 smooth-hover p-3 rounded-xl {% if request.path == '/budget/' or request.path == '/budget/calendar' %} bg-gray-900 text-gray-100 {% else %} bg-none text-gray-400 {% endif %}"
+            <a class="flex justify-between items-center font-semibold hover:bg-gray-600 hover:text-gray-100 smooth-hover p-3 rounded-xl {% if '/budget/' in request.path %} bg-gray-900 text-gray-100 {% else %} bg-none text-gray-400 {% endif %}"
                href="{% url 'budget' %}">
                 MY BUDGET
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
@@ -43,7 +43,7 @@
                           clip-rule="evenodd"/>
                 </svg>
             </a>
-            {% if request.path == '/budget/' or  request.path == '/budget/calendar' %}
+            {% if '/budget/' in request.path %}
                 <div class="px-3">
                     <a href="{% url 'calendar' %}" class="flex justify-between items-center font-semibold text-xs hover:bg-gray-300 hover:text-gray-600 smooth-hover px-3 py-1 {% if request.path == '/budget/calendar' %} bg-gray-500 text-gray-50 {% else %} bg-gray-200 text-gray-600 {% endif %}">
                         CALENDAR
@@ -52,7 +52,7 @@
                             <path fill-rule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5z" clip-rule="evenodd" />
                         </svg>
                     </a>
-                    <a href="{% url 'calendar' %}" class="flex justify-between items-center font-semibold text-xs hover:bg-gray-300 rounded-b-xl hover:text-gray-600 smooth-hover px-3 py-1 {% if request.path == '/budget/calendar/' %} bg-gray-500 text-gray-50 {% else %} bg-gray-200 text-gray-600 {% endif %}">
+                    <a href="{% url 'all_budgets' %}" class="flex justify-between items-center font-semibold text-xs hover:bg-gray-300 rounded-b-xl hover:text-gray-600 smooth-hover px-3 py-1 {% if request.path == '/budget/all' %} bg-gray-500 text-gray-50 {% else %} bg-gray-200 text-gray-600 {% endif %}">
                         PAST BUDGETS
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" />
