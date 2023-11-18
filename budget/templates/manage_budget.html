@@ -2,7 +2,7 @@
 {% load widget_tweaks %}
 
 {% block content %}
-    <form id="budget_form" method="POST" x-data="manageBudget()" x-init="debug()">
+    <form id="budget_form" method="POST" x-data="manageBudget()">
         {% csrf_token %}
 
         <div class="space-y-12">

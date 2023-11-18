@@ -2,12 +2,14 @@ import datetime
 import json
 import uuid
 
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from budget.models import Budget, IncomeSource, UserExpense, CommonExpense
 from budget.forms import UserExpenseForm, IncomeSourceForm
 
 
 # Create your views here.
+@login_required
 def get_budget(request, year=None, month=None):
     if year and month:
         target_date = datetime.date(year, month, 1)
@@ -39,6 +41,7 @@ def get_budget(request, year=None, month=None):
     return render(request, 'budget.html', context)
 
 
+@login_required
 def get_calendar(request):
     target_date = datetime.date.today()
     year = target_date.year
@@ -72,57 +75,57 @@ def get_calendar(request):
     return render(request, 'calendar.html', context)
 
 
+@login_required
 def create_budget(request):
+    user_expense_form = None
+    income_source_form = None
+
     if request.method == 'POST':
         income_sources = []
         expenses = []
 
-        form = UserExpenseForm(request.POST)
+        income_source_count = int(request.POST.get('incomeSourceCount', 0))
+        expense_count = int(request.POST.get('expenseCount', 0))
 
-        if form.is_valid():
-            income_source_count = int(request.POST.get('incomeSourceCount', 0))
-            expense_count = int(request.POST.get('expenseCount', 0))
+        for i in range(0, income_source_count):
+            income_source_name = request.POST.get(f'income_source_name_{i}')
+            income_source_amount = int(request.POST.get(f'income_source_amount_{i}'))
+            # Validate and create IncomeSource instances
+            if income_source_name and income_source_amount:
+                income_sources.append({
+                    'name': income_source_name,
+                    'amount': income_source_amount,
+                })
 
-            for i in range(1, income_source_count + 1):
-                income_source_name = request.POST.get(f'income_source_name_{i}')
-                income_source_amount = int(request.POST.get(f'income_source_amount_{i}'))
-                # Validate and create IncomeSource instances
-                if income_source_name and income_source_amount:
-                    income_sources.append({
-                        'name': income_source_name,
-                        'amount': income_source_amount,
-                    })
+        for i in range(0, expense_count):
+            expense_name = request.POST.get(f'expense_name_{i}')
+            expense_amount = int(request.POST.get(f'expense_amount_{i}'))
+            expense_frequency = request.POST.get(f'expense_frequency_{i}')
+            expense_due_date = request.POST.get(f'expense_due_date_{i}')
+            # Validate and create Expense instances
+            if expense_name and expense_amount:
+                expenses.append({
+                    'name': expense_name,
+                    'amount': expense_amount,
+                    'frequency': expense_frequency,
+                    'due_date': expense_due_date,
+                })
 
-            for i in range(1, expense_count + 1):
-                expense_name = request.POST.get(f'expense_name_{i}')
-                expense_amount = int(request.POST.get(f'expense_amount_{i}'))
-                expense_frequency = form.cleaned_data['frequency']
-                expense_due_date = form.cleaned_data['due_date']
-                # Validate and create Expense instances
-                if expense_name and expense_amount:
-                    expenses.append({
-                        'name': expense_name,
-                        'amount': expense_amount,
-                        'frequency': expense_frequency,
-                        'due_date': expense_due_date,
-                    })
+        budget, created = Budget.objects.get_or_create(user=request.user)
+        if not created:
+            return redirect('budget')
 
-            budget, created = Budget.objects.get_or_create(user=request.user)
-            if not created:
-                return redirect('budget')
+        for source_data in income_sources:
+            income_source = IncomeSource.objects.create(user=request.user, **source_data)
+            budget.income_sources.add(income_source)
 
-            for source_data in income_sources:
-                income_source = IncomeSource.objects.create(user=request.user, **source_data)
-                budget.income_sources.add(income_source)
-                budget.total_monthly_income += source_data['amount']
+        for expense_data in expenses:
+            expense = UserExpense.objects.create(user=request.user, **expense_data)
+            budget.expenses.add(expense)
 
-            for expense_data in expenses:
-                expense = UserExpense.objects.create(user=request.user, **expense_data)
-                budget.expenses.add(expense)
-                budget.total_monthly_expenses += expense_data['amount']
+        budget.save()
 
-            budget.surplus = budget.total_monthly_income - budget.total_monthly_expenses
-            budget.save()
+        return redirect('budget')
     else:
         user_expense_form = UserExpenseForm()
         income_source_form = IncomeSourceForm()
@@ -135,16 +138,15 @@ def create_budget(request):
 
     return render(request, 'new_budget.html', context)
 
+
 # Edit a current budget (add, remove, update income sources and expenses)
+@login_required
 def edit_budget(request, year, month):
     budget = Budget.objects.get(user=request.user, created__month=month, created__year=year)
 
     if request.method == 'POST':
         income_sources = []
         expenses = []
-        total_monthly_income = 0
-        total_monthly_expenses = 0
-        surplus = 0
 
         income_source_count = int(request.POST.get('incomeSourceCount', 0))
         expense_count = int(request.POST.get('expenseCount', 0))
@@ -153,15 +155,11 @@ def edit_budget(request, year, month):
 
         if deleted_income_sources:
             for income_source_id in deleted_income_sources:
-                income_source = IncomeSource.objects.get(id=income_source_id)
-                total_monthly_income -= income_source.amount
-                income_source.delete()
+                IncomeSource.objects.delete(id=income_source_id)
 
         if deleted_expenses:
             for expense_id in deleted_expenses:
-                expense = UserExpense.objects.get(id=expense_id)
-                total_monthly_expenses -= expense.amount
-                expense.delete()
+                UserExpense.objects.delete(id=expense_id)
 
         for i in range(0, income_source_count):
             income_source_id = request.POST.get(f'income_source_id_{i}')
@@ -204,16 +202,11 @@ def edit_budget(request, year, month):
             if created:
                 budget.income_sources.add(income_source)
 
-            total_monthly_income += income_source_data['amount']
-
         for expense_data in expenses:
             expense, created = UserExpense.objects.update_or_create(user=request.user, **expense_data)
             if created:
                 budget.expenses.add(expense)
 
-            total_monthly_expenses += expense_data['amount']
-
-        budget.surplus = total_monthly_income - total_monthly_expenses
         budget.save()
 
         if year == datetime.date.today().year and month == datetime.date.today().month:

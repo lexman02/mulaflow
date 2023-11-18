@@ -7,6 +7,7 @@ name = "pypi"
 django = "*"
 django-browser-reload = "*"
 django-widget-tweaks = "*"
+django-allauth = "*"
 
 [dev-packages]
 

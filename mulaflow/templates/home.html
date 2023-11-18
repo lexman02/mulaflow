@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block base_content %}
+    <div class="h-screen p-24 flex flex-col align-middle">
+        <div class="h-full w-full flex justify-evenly items-center">
+            <a href="{% url 'account_login' %}" class="w-1/4 bg-teal-500 p-12 font-extrabold text-2xl text-white text-center">
+                Login
+            </a>
+            <span class="font-extrabold text-6xl">OR</span>
+            <a href="{% url 'account_signup' %}" class="w-1/4 bg-teal-500 p-12 font-extrabold text-2xl text-white text-center">
+                Sign Up
+            </a>
+        </div>
+    </div>
+{% endblock %}

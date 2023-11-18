@@ -1,10 +1,12 @@
 import datetime
 
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
 from budget.models import Budget
 
 
+@login_required
 def get_dashboard(request):
     current_date = datetime.date.today()
     # Get the authenticated user's budget for the current month, assuming your logic to retrieve it

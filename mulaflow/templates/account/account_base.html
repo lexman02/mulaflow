@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block base_content %}
+    <div class="min-h-screen flex flex-col justify-center items-center">
+        <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray">
+            {% include 'includes/full-logo.html' %}
+        </a>
+        <div class="w-full bg-amber-50/70 rounded-lg shadow-lg shadow-teal-500/50 md:mt-0 sm:max-w-md xl:p-0">
+            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                {% block account_content %}
+
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
