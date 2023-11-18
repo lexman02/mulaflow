@@ -144,3 +144,4 @@ node_modules
 
 # Misc.
 *.sqlite3
+.DS_Store
