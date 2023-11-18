@@ -79,6 +79,25 @@ def get_calendar(request, year=None, month=None):
     return render(request, 'calendar.html', context)
 
 
+# Get all budgets for the current user (excluding the current month)
+@login_required
+def get_past_budgets(request):
+    budgets = []
+    today = datetime.date.today()
+
+    for budget in Budget.objects.filter(user=request.user).order_by('-created').exclude(created__month=today.month, created__year=today.year):
+        budget_totals = Budget.objects.current_budget_totals(request.user)
+        budgets.append({
+            'budget': budget,
+            'totals': budget_totals,
+        })
+
+    context = {
+        'budgets': budgets,
+    }
+    return render(request, 'past_budgets.html', context)
+
+
 # Create a new budget (add income sources and expenses)
 @login_required
 def create_budget(request):
