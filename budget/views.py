@@ -8,7 +8,7 @@ from budget.models import Budget, IncomeSource, UserExpense, CommonExpense
 from budget.forms import UserExpenseForm, IncomeSourceForm
 
 
-# Create your views here.
+# Get the budget view for the current month
 @login_required
 def get_budget(request, year=None, month=None):
     if year and month:
@@ -41,11 +41,15 @@ def get_budget(request, year=None, month=None):
     return render(request, 'budget.html', context)
 
 
+# Get the calendar view for the current month
 @login_required
-def get_calendar(request):
-    target_date = datetime.date.today()
-    year = target_date.year
-    month = target_date.month
+def get_calendar(request, year=None, month=None):
+    if year and month:
+        target_date = datetime.date(year, month, 1)
+    else:
+        target_date = datetime.date.today()
+        year = target_date.year
+        month = target_date.month
 
     try:
         cur_budget = Budget.objects.get(user=request.user,
@@ -75,6 +79,7 @@ def get_calendar(request):
     return render(request, 'calendar.html', context)
 
 
+# Create a new budget (add income sources and expenses)
 @login_required
 def create_budget(request):
     user_expense_form = None
