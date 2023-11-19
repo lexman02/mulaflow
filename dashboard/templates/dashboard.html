@@ -14,6 +14,12 @@
             <h4 class="text-red-900 text-xl font-semibold">EXPENSES</h4>
             <h4 class="text-white text-4xl font-extrabold">${{ budget_totals.expenses }}</h4>
         </div>
+        <div class="relative bg-gray-200 rounded-3xl shadow-xl p-5">
+            <canvas id="doughnut-chart" class="w-full h-full"></canvas>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-gray-900 text-2xl font-extrabold uppercase">
+                {% now 'F' %}
+            </div>
+        </div>
         <div class="col-span-2 bg-gray-200 rounded-3xl shadow-xl p-5 space-y-4">
             <h4 class="text-gray-900 text-2xl font-extrabold">Upcoming Expenses</h4>
             <div class="space-y-2 overflow-y-scroll">
@@ -35,4 +41,41 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Get the context of the canvas element we want to select
+        var ctx = document.getElementById("doughnut-chart").getContext('2d');
+
+        var myDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Surplus', 'Income', 'Expenses'],
+                datasets: [{
+                    data: [
+                        {{ budget_totals.surplus }},
+                        {{ budget_totals.income }},
+                        {{ budget_totals.expenses }}
+                    ],
+                    backgroundColor: [
+                        '#16A34A',
+                        '#F59E0B',
+                        '#DC2626'
+                    ],
+                    borderWidth: 0,
+                    borderJoinStyle: 'round',
+                    cutout: '80%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            },
+        });
+    </script>
 {% endblock %}
