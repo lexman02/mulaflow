@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 from django.contrib.auth.models import User
@@ -65,8 +66,7 @@ class BudgetManager(models.Manager):
 
         return prev_budget, next_budget
 
-    def current_budget_totals(self, user):
-        budget = self.get(user=user)
+    def current_budget_totals(self, budget):
         income, expenses = sum(item.amount for item in budget.income_sources.all()), sum(item.amount for item in budget.expenses.all())
         return {'income': income, 'expenses': expenses, 'surplus': income - expenses}
 
@@ -76,6 +76,6 @@ class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     income_sources = models.ManyToManyField(IncomeSource)
     expenses = models.ManyToManyField(UserExpense)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    created = models.DateField(default=datetime.date.today)
+    updated = models.DateField(auto_now=True)
     objects = BudgetManager()

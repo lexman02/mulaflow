@@ -25,7 +25,7 @@ def get_budget(request, year=None, month=None):
 
         prev_budget, next_budget = Budget.objects.adjacent_budgets(request.user, year, month)
 
-        budget_totals = Budget.objects.current_budget_totals(request.user)
+        budget_totals = Budget.objects.current_budget_totals(cur_budget)
 
         context = {
             'budget': cur_budget,
@@ -85,8 +85,8 @@ def get_past_budgets(request):
     budgets = []
     today = datetime.date.today()
 
-    for budget in Budget.objects.filter(user=request.user).order_by('-created').exclude(created__month=today.month, created__year=today.year):
-        budget_totals = Budget.objects.current_budget_totals(request.user)
+    for budget in Budget.objects.filter(user=request.user).exclude(created__month=today.month):
+        budget_totals = Budget.objects.current_budget_totals(budget)
         budgets.append({
             'budget': budget,
             'totals': budget_totals,
@@ -135,7 +135,7 @@ def create_budget(request):
                     'due_date': expense_due_date,
                 })
 
-        budget, created = Budget.objects.get_or_create(user=request.user)
+        budget, created = Budget.objects.get_or_create(user=request.user, created__month=datetime.date.today().month, created__year=datetime.date.today().year)
         if not created:
             return redirect('budget')
 
@@ -179,11 +179,11 @@ def edit_budget(request, year, month):
 
         if deleted_income_sources:
             for income_source_id in deleted_income_sources:
-                IncomeSource.objects.delete(id=income_source_id)
+                IncomeSource.objects.get(id=income_source_id).delete()
 
         if deleted_expenses:
             for expense_id in deleted_expenses:
-                UserExpense.objects.delete(id=expense_id)
+                UserExpense.objects.get(id=expense_id).delete()
 
         for i in range(0, income_source_count):
             income_source_id = request.POST.get(f'income_source_id_{i}')
@@ -222,16 +222,15 @@ def edit_budget(request, year, month):
                 })
 
         for income_source_data in income_sources:
-            income_source, created = IncomeSource.objects.update_or_create(user=request.user, **income_source_data)
+            income_source, created = IncomeSource.objects.update_or_create(user=request.user, id=income_source_data['id'], defaults=income_source_data)
             if created:
                 budget.income_sources.add(income_source)
 
         for expense_data in expenses:
-            expense, created = UserExpense.objects.update_or_create(user=request.user, **expense_data)
+            expense, created = UserExpense.objects.update_or_create(user=request.user, id=expense_data['id'], defaults=expense_data)
             if created:
+                print(expense.name)
                 budget.expenses.add(expense)
-
-        budget.save()
 
         if year == datetime.date.today().year and month == datetime.date.today().month:
             return redirect('budget')
