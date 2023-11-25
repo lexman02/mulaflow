@@ -4,25 +4,49 @@
     <div class="grid grid-cols-3 gap-11">
         <div class="w-full shadow-xl shadow-green-600/40 px-5 py-4 bg-green-600 rounded-3xl">
             <h4 class="text-green-900 text-xl font-semibold">SURPLUS</h4>
-            <h4 class="text-white text-4xl font-extrabold">${{ budget_totals.surplus }}</h4>
+            <h4 class="text-white text-4xl font-extrabold">${{ today.totals.surplus }}</h4>
         </div>
         <div class="w-full shadow-xl shadow-amber-500/40 px-5 py-4 bg-amber-500 rounded-3xl">
             <h4 class="text-amber-800 text-xl font-semibold">INCOME</h4>
-            <h4 class="text-white text-4xl font-extrabold">${{ budget_totals.income }}</h4>
+            <h4 class="text-white text-4xl font-extrabold">${{ today.totals.income }}</h4>
         </div>
         <div class="w-full shadow-xl shadow-red-600/40 px-5 py-4 bg-red-600 rounded-3xl">
             <h4 class="text-red-900 text-xl font-semibold">EXPENSES</h4>
-            <h4 class="text-white text-4xl font-extrabold">${{ budget_totals.expenses }}</h4>
+            <h4 class="text-white text-4xl font-extrabold">${{ today.totals.expenses }}</h4>
         </div>
-        <div class="relative bg-gray-200 rounded-3xl shadow-xl p-5">
-            <canvas id="doughnut-chart" class="w-full h-full"></canvas>
+        <div class="col-span-full bg-gray-200 rounded-3xl shadow-xl p-3.5 space-y-4">
+            <div class="space-y-3.5" x-data="graphTabs()">
+                <div class="text-center">
+                    <div class="inline-flex p-1 pr-0 bg-gray-300 rounded-full overflow-hidden">
+                        <template x-for="tab in tabs">
+                            <div :for="tab.name"
+                                   class="block transition ease-in-out duration-200 px-4 py-1 rounded-full cursor-pointer text-gray-800 text-xs font-semibold uppercase hover:bg-gray-800/50 hover:text-white mr-1"
+                                   :class="tab.active ? 'bg-gray-100': ''" @click="changeTab(tab)">
+                                <span x-text="tab.name"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <div x-show="isActive('surplus')" class="bg-gray-50 rounded-3xl py-1 px-5">
+                    <canvas id="surplus-graph" class=""></canvas>
+                </div>
+                <div x-show="isActive('income')" class="bg-gray-50 rounded-3xl py-1 px-5">
+                    <canvas id="income-graph" class=""></canvas>
+                </div>
+                <div x-show="isActive('expenses')" class="bg-gray-50 rounded-3xl py-1 px-5">
+                    <canvas id="expenses-graph" class=""></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-span-1 relative bg-gray-200 rounded-3xl shadow-xl p-5 h-3/5">
+            <canvas id="totals-breakdown" class="h-3/5 w-3/5"></canvas>
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-gray-900 text-2xl font-extrabold uppercase">
                 {% now 'F' %}
             </div>
         </div>
-        <div class="col-span-2 bg-gray-200 rounded-3xl shadow-xl p-5 space-y-4">
+        <div class="col-span-2 bg-gray-200 rounded-3xl shadow-xl p-5 space-y-4 h-3/5">
             <h4 class="text-gray-900 text-2xl font-extrabold">Upcoming Expenses</h4>
-            <div class="space-y-2 overflow-y-scroll">
+            <div class="space-y-2 h-3/5 overflow-y-scroll">
                 {% for expense in expenses %}
                     {% if expense.due_date >= today %}
                         <div class="bg-gray-50 rounded-xl shadow p-3 flex justify-between">
@@ -45,17 +69,20 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Get the context of the canvas element we want to select
-        var ctx = document.getElementById("doughnut-chart").getContext('2d');
+        const totalsBreakdown = document.getElementById("totals-breakdown").getContext('2d');
+        const surplusGraph = document.getElementById("surplus-graph").getContext('2d');
+        const incomeGraph = document.getElementById("income-graph").getContext('2d');
+        const expensesGraph = document.getElementById("expenses-graph").getContext('2d');
 
-        var myDoughnutChart = new Chart(ctx, {
+        const totalsDoughnutChart = new Chart(totalsBreakdown, {
             type: 'doughnut',
             data: {
                 labels: ['Surplus', 'Income', 'Expenses'],
                 datasets: [{
                     data: [
-                        {{ budget_totals.surplus }},
-                        {{ budget_totals.income }},
-                        {{ budget_totals.expenses }}
+                        {{ today.totals.surplus }},
+                        {{ today.totals.income }},
+                        {{ today.totals.expenses }}
                     ],
                     backgroundColor: [
                         '#16A34A',
@@ -77,5 +104,122 @@
                 }
             },
         });
+
+        const monthLabels = [
+            {% for month in totals_by_month.months %}
+                '{{ month }}',
+            {% endfor %}
+        ]
+
+        const surplusLineChart = new Chart(surplusGraph, {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Surplus',
+                    data: [
+                        {% for totals in totals_by_month.surplus %}
+                            {{ totals }},
+                        {% endfor %}
+                    ],
+                    borderColor: [
+                        '#16A34A',
+                    ],
+                    borderWidth: 2,
+                    borderJoinStyle: 'round',
+                    tension: 0.3,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            },
+        });
+
+        const incomeLineChart = new Chart(incomeGraph, {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Income',
+                    data: [
+                        {% for totals in totals_by_month.income %}
+                            {{ totals }},
+                        {% endfor %}
+                    ],
+                    borderColor: [
+                        '#F59E0B',
+                    ],
+                    borderWidth: 2,
+                    borderJoinStyle: 'round',
+                    tension: 0.3,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            },
+        });
+
+        const expensesLineChart = new Chart(expensesGraph, {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Expenses',
+                    data: [
+                        {% for totals in totals_by_month.expenses %}
+                            {{ totals }},
+                        {% endfor %}
+                    ],
+                    borderColor: [
+                        '#DC2626',
+                    ],
+                    borderWidth: 2,
+                    borderJoinStyle: 'round',
+                    tension: 0.3,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            },
+        });
+    </script>
+    <script>
+        function graphTabs() {
+            return {
+                tabs: [
+                    {name: 'surplus', active: true},
+                    {name: 'income', active: false},
+                    {name: 'expenses', active: false},
+                ],
+
+                changeTab(tab) {
+                    this.currentTab = tab.name;
+                    this.tabs.forEach(tab => tab.active = false);
+                    tab.active = true;
+                },
+
+                isActive(tab) {
+                    return this.tabs.find(tab => tab.active).name === tab;
+                },
+            }
+        }
     </script>
 {% endblock %}
