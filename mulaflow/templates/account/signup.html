@@ -7,31 +7,92 @@
     </h1>
     <form class="space-y-4 md:space-y-6" method="POST" action="{% url 'account_signup' %}">
         {% csrf_token %}
+        {% if form.non_field_errors %}
+            <ul class="text-red-500 text-sm mt-1">
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
         <div>
-            <label for="{{ form.username.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">Username</label>
-            {% render_field form.username class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+            <label for="{{ form.username.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">{{ form.username.label }}</label>
+            {% if form.username.errors %}
+                {% render_field form.username class+="border border-red-500 text-red-500 sm:text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" %}
+                <ul class="text-red-500 text-sm mt-1">
+                    {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {% render_field form.username class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+            {% endif %}
         </div>
         <div>
-            <label for="{{ form.email.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">Email</label>
-            {% render_field form.email class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+            <label for="{{ form.email.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">{{ form.email.label }}</label>
+            {% if form.email.errors %}
+                {% render_field form.email class+="border border-red-500 text-red-500 sm:text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" %}
+                <ul class="text-red-500 text-sm mt-1">
+                    {% for error in form.email.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {% render_field form.email class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+            {% endif %}
         </div>
         <div class="flex items-center justify-between">
             <div>
-                <label for="{{ form.first_name.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">First Name</label>
-                {% render_field form.first_name class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+                <label for="{{ form.first_name.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">{{ form.first_name.label }}</label>
+                {% if form.first_name.errors %}
+                    {% render_field form.first_name class+="border border-red-500 text-red-500 sm:text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        {% for error in form.first_name.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    {% render_field form.first_name class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+                {% endif %}
             </div>
             <div>
-                <label for="{{ form.last_name.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">Last Name</label>
-                {% render_field form.last_name class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+                <label for="{{ form.last_name.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">{{ form.last_name.label }}</label>
+                {% if form.last_name.errors %}
+                    {% render_field form.last_name class+="border border-red-500 text-red-500 sm:text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        {% for error in form.last_name.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    {% render_field form.last_name class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+                {% endif %}
             </div>
         </div>
         <div>
-            <label for="{{ form.password1.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">Password</label>
-            {% render_field form.password1 class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+            <label for="{{ form.password1.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">{{ form.password1.label }}</label>
+            {% if form.password1.errors %}
+                {% render_field form.password1 class+="border border-red-500 text-red-500 sm:text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" %}
+                <ul class="text-red-500 text-sm mt-1">
+                    {% for error in form.password1.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {% render_field form.password1 class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+            {% endif %}
         </div>
         <div>
-            <label for="{{ form.password2.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">Confirm Password</label>
-            {% render_field form.password2 class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+            <label for="{{ form.password2.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">{{  form.password2.label }}</label>
+            {% if form.password2.errors %}
+                {% render_field form.password2 class+="border border-red-500 text-red-500 sm:text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" %}
+                <ul class="text-red-500 text-sm mt-1">
+                    {% for error in form.password2.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {% render_field form.password2 class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+            {% endif %}
         </div>
         {% if redirect_field_value %}
             <input type="hidden"

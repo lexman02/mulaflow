@@ -16,26 +16,36 @@
             </div>
         {% endif %}
         <div>
-            <label for="{{ form.login.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">Your email</label>
+            <label for="{{ form.login.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">{{ form.login.label }}</label>
             {% if form.login.errors %}
                 {% render_field form.login class+="border border-red-500 text-red-500 sm:text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" %}
                 {% for error in form.login.errors %}
-                    <div class="text-red-500">
-                        {{ error }}
-                    </div>
+                    <ul class="text-red-500 text-sm mt-1">
+                        <li>{{ error }}</li>
+                    </ul>
+                {% endfor %}
+            {% else %}
+                {% render_field form.login class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
+            {% endif %}
+            {% if form.login.errors %}
+                {% render_field form.login class+="border border-red-500 text-red-500 sm:text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" %}
+                {% for error in form.login.errors %}
+                    <ul class="text-red-500 text-sm mt-1">
+                        <li>{{ error }}</li>
+                    </ul>
                 {% endfor %}
             {% else %}
                 {% render_field form.login class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
             {% endif %}
         </div>
         <div>
-            <label for="{{ form.password.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">Password</label>
+            <label for="{{ form.password.id_for_label }}" class="block mb-2 text-sm font-medium text-gray">{{ form.password.label }}</label>
             {% if form.password.errors %}
                 {% render_field form.password class+="border border-red-500 text-red-500 sm:text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" %}
                 {% for error in form.password.errors %}
-                    <div class="text-red-500">
-                        {{ error }}
-                    </div>
+                    <ul class="text-red-500 text-sm mt-1">
+                        <li>{{ error }}</li>
+                    </ul>
                 {% endfor %}
             {% else %}
                 {% render_field form.password class+="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" %}
@@ -47,7 +57,7 @@
                     {% render_field form.remember class+="w-4 h-4 form-checkbox text-green-500 border border-gray-300 rounded focus:ring-3 focus:ring-green-500" %}
                 </div>
                 <div class="ml-3 text-sm">
-                    <label for="{{ form.remember.id_for_label }}" class="text-gray-500">Remember me</label>
+                    <label for="{{ form.remember.id_for_label }}" class="text-gray-500">{{ form.remember.label }}</label>
                 </div>
             </div>
             <a href="{% url 'account_reset_password' %}" class="text-sm font-medium text-green-500 hover:underline">Forgot password?</a>
